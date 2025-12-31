@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 30
+
+int top = -1;
+char stack[MAX];
+
+// Function declarations
+void push(char item);
+char pop();
+int match(char a, char b);
+int check(char exp[]);
+
+void push(char item) {
+    if (top == MAX - 1) {
+        printf("Stack Overflow\n");
+    } else {
+        stack[++top] = item;
+    }
+}
+
+char pop() {
+    if (top == -1) {
+        printf("Stack Underflow\n");
+        return '\0'; // return null character in underflow case
+    } else {
+        return stack[top--];
+    }
+}
+
+int match(char a, char b) {
+    if (a == '(' && b == ')') return 1;
+    if (a == '{' && b == '}') return 1;
+    if (a == '[' && b == ']') return 1;
+    return 0;
+}
+
+int check(char exp[]) {
+    int i;
+    char temp;
+    for (i = 0; i < strlen(exp); i++) {
+        if (exp[i] == '(' || exp[i] == '{' || exp[i] == '[') {
+            push(exp[i]);
+        } else if (exp[i] == ')' || exp[i] == '}' || exp[i] == ']') {
+            if (top == -1) {
+                printf("More right brackets than left at position %d\n", i);
+                return 0;
+            }
+            temp = pop();
+            if (!match(temp, exp[i])) {
+                printf("Mismatched brackets: %c and %c at position %d\n", temp, exp[i], i);
+                return 0;
+            }
+        }
+    }
+
+    if (top == -1) {
+        return 1; // balanced
+    } else {
+        printf("More left brackets than right\n");
+        return 0;
+    }
+}
+
+int main() {
+    char exp[MAX];
+    int valid;
+
+    printf("Enter the expression: ");
+    fgets(exp, MAX, stdin); // safer than gets()
+
+    // Remove newline character if present
+    exp[strcspn(exp, "\n")] = 0;
+
+    valid = check(exp);
+
+    if (valid == 1) {
+        printf("Expression is valid (balanced).\n");
+    } else {
+        printf("Expression is not valid (unbalanced).\n");
+    }
+
+    return 0;
+}
+
